@@ -6,9 +6,9 @@ import (
 	"strings"
 )
 
-var defaultHandler *Handler
+var defaultHandler IValidatorHandler
 
-func DefaultHandler() *Handler {
+func DefaultHandler() IValidatorHandler {
 	if defaultHandler == nil {
 		defaultHandler = new(Handler)
 		defaultHandler.Attach(&Array{})
@@ -25,8 +25,8 @@ type Handler struct {
 	validators []IValidator
 }
 
-func (self *Handler) Attach(validator IValidator) {
-	self.validators = append(self.validators, validator)
+func (self *Handler) Attach(v IValidator) {
+	self.validators = append(self.validators, v)
 }
 
 func (self *Handler) validateField(f reflect.StructField, fv reflect.Value) (errs []error) {
