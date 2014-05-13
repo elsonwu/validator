@@ -20,6 +20,10 @@ func (self *String) Filter(f reflect.StructField, fv reflect.Value) bool {
 }
 
 func (self *String) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
+	if "required" == f.Tag.Get("required") && "" == fv.String() {
+		errs = append(errs, errors.New(f.Name+" cannot be blank"))
+	}
+
 	min := f.Tag.Get("min")
 	if "" != min {
 		min2, err := strconv.Atoi(min)

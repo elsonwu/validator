@@ -13,6 +13,10 @@ func (self *Float) Filter(f reflect.StructField, fv reflect.Value) bool {
 }
 
 func (self *Float) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
+	if "required" == f.Tag.Get("required") && 0 == fv.Float() {
+		errs = append(errs, errors.New(f.Name+" cannot be blank"))
+	}
+
 	min := f.Tag.Get("min")
 	if "" != min {
 		min2, err := strconv.ParseFloat(min, 64)
