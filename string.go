@@ -13,6 +13,7 @@ const (
 )
 
 type String struct {
+	CoreValidate
 }
 
 func (self *String) Filter(f reflect.StructField, fv reflect.Value) bool {

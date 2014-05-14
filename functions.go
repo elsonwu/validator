@@ -16,6 +16,7 @@ func DefaultHandler() IValidatorHandler {
 		defaultHandler.Attach(&Float{})
 		defaultHandler.Attach(&String{})
 		defaultHandler.Attach(&Map{})
+		defaultHandler.Attach(&Interface{})
 	}
 
 	return defaultHandler
@@ -26,10 +27,11 @@ type Handler struct {
 }
 
 func (self *Handler) Attach(v IValidator) {
+	v.SetHandler(self)
 	self.validators = append(self.validators, v)
 }
 
-func (self *Handler) validateField(f reflect.StructField, fv reflect.Value) (errs []error) {
+func (self *Handler) ValidateField(f reflect.StructField, fv reflect.Value) (errs []error) {
 
 	if reflect.Struct == f.Type.Kind() {
 		if es := self.Validate(fv.Interface(), nil); es != nil {
@@ -85,7 +87,7 @@ func (self *Handler) Validate(m interface{}, attributes []string) (errs []error)
 			} else { //no ".", so we validate directly
 				if f, ok := refType.FieldByName(name); ok {
 					if fv := refValue.FieldByName(name); fv.IsValid() {
-						if es := self.validateField(f, fv); es != nil {
+						if es := self.ValidateField(f, fv); es != nil {
 							errs = append(errs, es...)
 						}
 					} else {
@@ -100,7 +102,7 @@ func (self *Handler) Validate(m interface{}, attributes []string) (errs []error)
 		for i, numFile := 0, refType.NumField(); i < numFile; i++ {
 			f := refType.Field(i)
 			fv := refValue.Field(i)
-			if es := self.validateField(f, fv); es != nil {
+			if es := self.ValidateField(f, fv); es != nil {
 				errs = append(errs, es...)
 			}
 		}

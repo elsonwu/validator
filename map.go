@@ -6,7 +6,9 @@ import (
 	"strings"
 )
 
-type Map struct{}
+type Map struct {
+	CoreValidate
+}
 
 func (self *Map) Filter(f reflect.StructField, fv reflect.Value) bool {
 	return f.Type.Kind() == reflect.Map

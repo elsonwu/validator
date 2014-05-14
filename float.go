@@ -6,7 +6,9 @@ import (
 	"strconv"
 )
 
-type Float struct{}
+type Float struct {
+	CoreValidate
+}
 
 func (self *Float) Filter(f reflect.StructField, fv reflect.Value) bool {
 	return f.Type.Kind() == reflect.Float32 || f.Type.Kind() == reflect.Float64

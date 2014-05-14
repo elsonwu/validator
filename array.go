@@ -6,7 +6,9 @@ import (
 	"strconv"
 )
 
-type Array struct{}
+type Array struct {
+	CoreValidate
+}
 
 func (self *Array) Filter(f reflect.StructField, fv reflect.Value) bool {
 	return f.Type.Kind() == reflect.Array || f.Type.Kind() == reflect.Slice
@@ -15,6 +17,16 @@ func (self *Array) Filter(f reflect.StructField, fv reflect.Value) bool {
 func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
 	if "required" == f.Tag.Get("required") && fv.IsNil() {
 		errs = append(errs, errors.New(f.Name+" cannot be blank"))
+	}
+
+	// if the item in array/slice is struct,
+	// we need to run handler.Validate again.
+	if !fv.IsNil() {
+		for i := 0; i < fv.Len(); i++ {
+			if v := fv.Index(i); v.Kind() == reflect.Struct {
+				errs = append(errs, self.CoreValidate.handler.Validate(v.Interface(), nil)...)
+			}
+		}
 	}
 
 	min := f.Tag.Get("min")

@@ -6,7 +6,9 @@ import (
 	"strconv"
 )
 
-type Int struct{}
+type Int struct {
+	CoreValidate
+}
 
 func (self *Int) Filter(f reflect.StructField, fv reflect.Value) bool {
 	return f.Type.Kind() == reflect.Int ||
