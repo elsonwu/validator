@@ -37,7 +37,9 @@ A simple struct validator
 	
 #user-defined validator
 
-	type YourValidator struct {}
+	type YourValidator struct {
+		validator.CoreValidate
+	}
 	func (self *YourValidator) Filter(f reflect.StructField, fv reflect.Value) bool {
 		//filter the type of field you want to validate
 		return true	
