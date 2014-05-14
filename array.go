@@ -24,7 +24,9 @@ func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []err
 	if !fv.IsNil() {
 		for i := 0; i < fv.Len(); i++ {
 			if v := fv.Index(i); v.Kind() == reflect.Struct {
-				errs = append(errs, self.CoreValidate.handler.Validate(v.Interface(), nil)...)
+				if v.CanAddr() && v.Addr().CanInterface() {
+					errs = append(errs, self.CoreValidate.handler.Validate(v.Addr().Interface(), nil)...)
+				}
 			}
 		}
 	}

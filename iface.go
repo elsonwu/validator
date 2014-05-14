@@ -23,6 +23,7 @@ type IValidatorHandler interface {
 	Validate(m interface{}, attributes []string) (errs []error)
 	Attach(v IValidator)
 }
+
 type IValidateModel interface {
 	Validate() []error
 }

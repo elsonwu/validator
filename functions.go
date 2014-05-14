@@ -51,7 +51,6 @@ func (self *Handler) ValidateField(f reflect.StructField, fv reflect.Value) (err
 }
 
 func (self *Handler) Validate(m interface{}, attributes []string) (errs []error) {
-
 	refType := reflect.TypeOf(m)
 	refValue := reflect.ValueOf(m)
 	if refType.Kind() == reflect.Ptr {
