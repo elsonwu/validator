@@ -3,6 +3,8 @@ package validator
 import (
 	"errors"
 	"reflect"
+
+	"github.com/elsonwu/i18n"
 )
 
 type Interface struct {
@@ -15,7 +17,7 @@ func (self *Interface) Filter(f reflect.StructField, fv reflect.Value) bool {
 
 func (self *Interface) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
 	if "required" == f.Tag.Get("required") && fv.IsNil() {
-		errs = append(errs, errors.New(f.Name+" cannot be blank"))
+		errs = append(errs, errors.New(i18n.T("%s cannot be blank", f.Name)))
 	}
 
 	return
