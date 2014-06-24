@@ -27,3 +27,7 @@ type IValidatorHandler interface {
 type IValidateModel interface {
 	Validate() []error
 }
+
+type IBeforeValidateModel interface {
+	BeforeValidate() []error
+}

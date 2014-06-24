@@ -62,6 +62,12 @@ func (self *Handler) Validate(m interface{}, attributes []string) (errs []error)
 		return []error{errors.New("The validate m must be struct or ptr")}
 	}
 
+	if im, ok := m.(IBeforeValidateModel); ok {
+		if es := im.BeforeValidate(); es != nil {
+			errs = append(errs, es...)
+		}
+	}
+
 	if attributes != nil {
 		for _, name := range attributes {
 			//Handle embedded attributes, for example: Profile.SecondaryEmail or event Comments.Id
