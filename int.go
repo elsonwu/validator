@@ -20,20 +20,20 @@ func (self *Int) Filter(f reflect.StructField, fv reflect.Value) bool {
 		f.Type.Kind() == reflect.Int64
 }
 
-func (self *Int) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
+func (self *Int) Validate(f reflect.StructField, fv reflect.Value) []error {
 	if "required" == f.Tag.Get("required") && 0 == fv.Int() {
-		errs = append(errs, errors.New(i18n.T("%s cannot be blank", FieldName(f))))
+		return []error{errors.New(i18n.T("%s cannot be blank", FieldName(f)))}
 	}
 
 	min := f.Tag.Get("min")
 	if "" != min {
 		min2, err := strconv.Atoi(min)
 		if err != nil {
-			errs = append(errs, err)
+			return []error{err}
 		}
 
 		if int64(min2) > fv.Int() {
-			errs = append(errs, errors.New(i18n.T("%s min err", FieldName(f))))
+			return []error{errors.New(i18n.T("%s is too small", FieldName(f)))}
 		}
 	}
 
@@ -41,13 +41,13 @@ func (self *Int) Validate(f reflect.StructField, fv reflect.Value) (errs []error
 	if "" != max {
 		max2, err := strconv.Atoi(max)
 		if err != nil {
-			errs = append(errs, err)
+			return []error{err}
 		}
 
 		if int64(max2) < fv.Int() {
-			errs = append(errs, errors.New(i18n.T("%s max err", FieldName(f))))
+			return []error{errors.New(i18n.T("%s is too big", FieldName(f)))}
 		}
 	}
 
-	return
+	return nil
 }

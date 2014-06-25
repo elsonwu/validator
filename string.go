@@ -17,20 +17,20 @@ func (self *String) Filter(f reflect.StructField, fv reflect.Value) bool {
 	return f.Type.Kind() == reflect.String
 }
 
-func (self *String) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
+func (self *String) Validate(f reflect.StructField, fv reflect.Value) []error {
 	if "required" == f.Tag.Get("required") && "" == fv.String() {
-		errs = append(errs, errors.New(i18n.T("%s cannot be blank", FieldName(f))))
+		return []error{errors.New(i18n.T("%s cannot be blank", FieldName(f)))}
 	}
 
 	min := f.Tag.Get("min")
 	if "" != min {
 		min2, err := strconv.Atoi(min)
 		if err != nil {
-			errs = append(errs, err)
+			return []error{err}
 		}
 
 		if min2 > fv.Len() {
-			errs = append(errs, errors.New(i18n.T("%s min err", FieldName(f))))
+			return []error{errors.New(i18n.T("%s is too short", FieldName(f)))}
 		}
 	}
 
@@ -38,11 +38,11 @@ func (self *String) Validate(f reflect.StructField, fv reflect.Value) (errs []er
 	if "" != max {
 		max2, err := strconv.Atoi(max)
 		if err != nil {
-			errs = append(errs, err)
+			return []error{err}
 		}
 
 		if max2 < fv.Len() {
-			errs = append(errs, errors.New(i18n.T("%s max err", FieldName(f))))
+			return []error{errors.New(i18n.T("%s is too long", FieldName(f)))}
 		}
 	}
 
@@ -51,14 +51,14 @@ func (self *String) Validate(f reflect.StructField, fv reflect.Value) (errs []er
 		switch isv {
 		case "email":
 			if !is.Email(fv.String()) {
-				errs = append(errs, errors.New(i18n.T("%s is not a valid email", FieldName(f))))
+				return []error{errors.New(i18n.T("%s is not a valid email", FieldName(f)))}
 			}
 		case "url":
 			if !is.Url(fv.String()) {
-				errs = append(errs, errors.New(i18n.T("%s is not a valid url", FieldName(f))))
+				return []error{errors.New(i18n.T("%s is not a valid url", FieldName(f)))}
 			}
 		}
 	}
 
-	return
+	return nil
 }

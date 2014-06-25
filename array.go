@@ -16,9 +16,9 @@ func (self *Array) Filter(f reflect.StructField, fv reflect.Value) bool {
 	return f.Type.Kind() == reflect.Array || f.Type.Kind() == reflect.Slice
 }
 
-func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
+func (self *Array) Validate(f reflect.StructField, fv reflect.Value) []error {
 	if "required" == f.Tag.Get("required") && fv.IsNil() {
-		errs = append(errs, errors.New(i18n.T("%s cannot be blank", FieldName(f))))
+		return []error{errors.New(i18n.T("%s cannot be blank", FieldName(f)))}
 	}
 
 	// if the item in array/slice is struct,
@@ -27,7 +27,7 @@ func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []err
 		for i := 0; i < fv.Len(); i++ {
 			if v := fv.Index(i); v.Kind() == reflect.Struct {
 				if v.CanAddr() && v.Addr().CanInterface() {
-					errs = append(errs, self.CoreValidate.handler.Validate(v.Addr().Interface(), nil)...)
+					return self.CoreValidate.handler.Validate(v.Addr().Interface(), nil)
 				}
 			}
 		}
@@ -37,11 +37,11 @@ func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []err
 	if "" != min {
 		min2, err := strconv.Atoi(min)
 		if err != nil {
-			errs = append(errs, err)
+			return []error{err}
 		}
 
 		if min2 > fv.Len() {
-			errs = append(errs, errors.New(i18n.T("%s min err", FieldName(f))))
+			return []error{errors.New(i18n.T("%s's length is too small", FieldName(f)))}
 		}
 	}
 
@@ -49,13 +49,13 @@ func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []err
 	if "" != max {
 		max2, err := strconv.Atoi(max)
 		if err != nil {
-			errs = append(errs, err)
+			return []error{err}
 		}
 
 		if max2 < fv.Len() {
-			errs = append(errs, errors.New(i18n.T("%s max err", FieldName(f))))
+			return []error{errors.New(i18n.T("%s's length  is too big", FieldName(f)))}
 		}
 	}
 
-	return
+	return nil
 }
