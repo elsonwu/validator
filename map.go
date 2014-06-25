@@ -18,7 +18,7 @@ func (self *Map) Filter(f reflect.StructField, fv reflect.Value) bool {
 
 func (self *Map) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
 	if "required" == f.Tag.Get("required") && fv.IsNil() {
-		errs = append(errs, errors.New(i18n.T("%s cannot be blank", f.Name)))
+		errs = append(errs, errors.New(i18n.T("%s cannot be blank", FieldName(f))))
 	}
 
 	ruleKeys := f.Tag.Get("keys")
@@ -33,11 +33,11 @@ func (self *Map) Validate(f reflect.StructField, fv reflect.Value) (errs []error
 
 	keys2 := fv.MapKeys()
 	if nil == keys2 {
-		errs = append(errs, errors.New(i18n.T("%s keys cannot be blank", f.Name)))
+		errs = append(errs, errors.New(i18n.T("%s keys cannot be blank", FieldName(f))))
 	}
 
 	if len(ks) != len(keys2) {
-		errs = append(errs, errors.New(i18n.T("%s count of keys is not the same as setting", f.Name)))
+		errs = append(errs, errors.New(i18n.T("%s count of keys is not the same as setting", FieldName(f))))
 	} else {
 		var find bool
 		for _, k := range ks {
@@ -50,7 +50,7 @@ func (self *Map) Validate(f reflect.StructField, fv reflect.Value) (errs []error
 			}
 
 			if !find {
-				errs = append(errs, errors.New(i18n.T("%s key %s does not exists", f.Name, k)))
+				errs = append(errs, errors.New(i18n.T("%s key %s does not exists", FieldName(f), k)))
 			}
 		}
 	}

@@ -8,6 +8,15 @@ import (
 
 var defaultHandler IValidatorHandler
 
+var FieldName func(f reflect.StructField) string
+
+func init() {
+	// default
+	FieldName = func(f reflect.StructField) string {
+		return f.Name
+	}
+}
+
 func DefaultHandler() IValidatorHandler {
 	if defaultHandler == nil {
 		defaultHandler = new(Handler)

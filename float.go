@@ -18,7 +18,7 @@ func (self *Float) Filter(f reflect.StructField, fv reflect.Value) bool {
 
 func (self *Float) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
 	if "required" == f.Tag.Get("required") && 0 == fv.Float() {
-		errs = append(errs, errors.New(i18n.T("%s cannot be blank", f.Name)))
+		errs = append(errs, errors.New(i18n.T("%s cannot be blank", FieldName(f))))
 	}
 
 	min := f.Tag.Get("min")
@@ -29,7 +29,7 @@ func (self *Float) Validate(f reflect.StructField, fv reflect.Value) (errs []err
 		}
 
 		if min2 > fv.Float() {
-			errs = append(errs, errors.New(i18n.T("%s min err", f.Name)))
+			errs = append(errs, errors.New(i18n.T("%s min err", FieldName(f))))
 		}
 	}
 
@@ -41,7 +41,7 @@ func (self *Float) Validate(f reflect.StructField, fv reflect.Value) (errs []err
 		}
 
 		if max2 < fv.Float() {
-			errs = append(errs, errors.New(i18n.T("%s max err", f.Name)))
+			errs = append(errs, errors.New(i18n.T("%s max err", FieldName(f))))
 		}
 	}
 

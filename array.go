@@ -18,7 +18,7 @@ func (self *Array) Filter(f reflect.StructField, fv reflect.Value) bool {
 
 func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []error) {
 	if "required" == f.Tag.Get("required") && fv.IsNil() {
-		errs = append(errs, errors.New(i18n.T("%s cannot be blank", f.Name)))
+		errs = append(errs, errors.New(i18n.T("%s cannot be blank", FieldName(f))))
 	}
 
 	// if the item in array/slice is struct,
@@ -41,7 +41,7 @@ func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []err
 		}
 
 		if min2 > fv.Len() {
-			errs = append(errs, errors.New(i18n.T("%s min err", f.Name)))
+			errs = append(errs, errors.New(i18n.T("%s min err", FieldName(f))))
 		}
 	}
 
@@ -53,7 +53,7 @@ func (self *Array) Validate(f reflect.StructField, fv reflect.Value) (errs []err
 		}
 
 		if max2 < fv.Len() {
-			errs = append(errs, errors.New(i18n.T("%s max err", f.Name)))
+			errs = append(errs, errors.New(i18n.T("%s max err", FieldName(f))))
 		}
 	}
 
