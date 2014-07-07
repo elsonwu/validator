@@ -17,7 +17,7 @@ func (self *Array) Filter(f reflect.StructField, fv reflect.Value) bool {
 }
 
 func (self *Array) Validate(f reflect.StructField, fv reflect.Value) []error {
-	if "required" == f.Tag.Get("required") && fv.IsNil() {
+	if "required" == f.Tag.Get("required") && (fv.IsNil() || 0 == fv.Len()) {
 		return []error{errors.New(i18n.T("%s cannot be blank", FieldName(f)))}
 	}
 
@@ -27,7 +27,9 @@ func (self *Array) Validate(f reflect.StructField, fv reflect.Value) []error {
 		for i := 0; i < fv.Len(); i++ {
 			if v := fv.Index(i); v.Kind() == reflect.Struct {
 				if v.CanAddr() && v.Addr().CanInterface() {
-					return self.CoreValidate.handler.Validate(v.Addr().Interface(), nil)
+					if errs := self.CoreValidate.handler.Validate(v.Addr().Interface(), nil); errs != nil {
+						return errs
+					}
 				}
 			}
 		}
