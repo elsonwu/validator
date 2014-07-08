@@ -41,10 +41,14 @@ func (self *Handler) Attach(v IValidator) {
 }
 
 func (self *Handler) ValidateField(f reflect.StructField, fv reflect.Value) (errs []error) {
+	if fv.Type().Kind() == reflect.Ptr {
+		fv = fv.Elem()
+	}
 
-	if reflect.Struct == f.Type.Kind() {
-		if es := self.Validate(fv.Interface(), nil); es != nil {
+	if reflect.Struct == fv.Kind() {
+		if es := self.Validate(fv.Addr().Interface(), nil); es != nil {
 			errs = append(errs, es...)
+			return
 		}
 	}
 
@@ -52,6 +56,7 @@ func (self *Handler) ValidateField(f reflect.StructField, fv reflect.Value) (err
 		if v.Filter(f, fv) {
 			if es := v.Validate(f, fv); es != nil {
 				errs = append(errs, es...)
+				return
 			}
 		}
 	}
@@ -73,7 +78,7 @@ func (self *Handler) Validate(m interface{}, attributes []string) (errs []error)
 
 	if im, ok := m.(IBeforeValidateModel); ok {
 		if es := im.BeforeValidate(); es != nil {
-			errs = append(errs, es...)
+			return es
 		}
 	}
 
@@ -120,6 +125,10 @@ func (self *Handler) Validate(m interface{}, attributes []string) (errs []error)
 				errs = append(errs, es...)
 			}
 		}
+	}
+
+	if 0 < len(errs) {
+		return
 	}
 
 	if im, ok := m.(IValidateModel); ok {
