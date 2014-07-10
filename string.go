@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/elsonwu/i18n"
 	"github.com/elsonwu/is"
@@ -48,7 +49,15 @@ func (self *String) Validate(f reflect.StructField, fv reflect.Value) []error {
 
 	isv := f.Tag.Get("is")
 	if "" != isv {
-		switch isv {
+		tags := strings.Split(isv, ",")
+
+		if 1 < len(tags) {
+			if "omitempty" == tags[1] && fv.String() == "" {
+				goto skip
+			}
+		}
+
+		switch tags[0] {
 		case "email":
 			if !is.Email(fv.String()) {
 				return []error{errors.New(i18n.T("%s is not a valid email", FieldName(f)))}
@@ -58,6 +67,7 @@ func (self *String) Validate(f reflect.StructField, fv reflect.Value) []error {
 				return []error{errors.New(i18n.T("%s is not a valid url", FieldName(f)))}
 			}
 		}
+	skip:
 	}
 
 	return nil
