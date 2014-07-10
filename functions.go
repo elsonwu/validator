@@ -4,11 +4,14 @@ import (
 	"errors"
 	"reflect"
 	"strings"
+
+	"github.com/elsonwu/is"
 )
 
-var defaultHandler IValidatorHandler
-
-var FieldName func(f reflect.StructField) string
+var (
+	defaultHandler IValidatorHandler
+	FieldName      func(f reflect.StructField) string
+)
 
 func init() {
 	// default
@@ -46,11 +49,17 @@ func (self *Handler) ValidateField(f reflect.StructField, fv reflect.Value) (err
 	}
 
 	if reflect.Struct == fv.Kind() {
+		if "omitempty" == f.Tag.Get("omitempty") && is.Zero(fv) {
+			goto skip
+		}
+
 		if es := self.Validate(fv.Addr().Interface(), nil); es != nil {
 			errs = append(errs, es...)
 			return
 		}
 	}
+
+skip:
 
 	for _, v := range self.validators {
 		if v.Filter(f, fv) {
