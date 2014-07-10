@@ -4,8 +4,6 @@ import (
 	"errors"
 	"reflect"
 	"strings"
-
-	"github.com/elsonwu/is"
 )
 
 var (
@@ -28,6 +26,7 @@ func DefaultHandler() IValidatorHandler {
 		defaultHandler.Attach(&Float{})
 		defaultHandler.Attach(&String{})
 		defaultHandler.Attach(&Map{})
+		defaultHandler.Attach(&Struct{})
 		defaultHandler.Attach(&Interface{})
 	}
 
@@ -43,34 +42,20 @@ func (self *Handler) Attach(v IValidator) {
 	self.validators = append(self.validators, v)
 }
 
-func (self *Handler) ValidateField(f reflect.StructField, fv reflect.Value) (errs []error) {
+func (self *Handler) ValidateField(f reflect.StructField, fv reflect.Value) []error {
 	if fv.Type().Kind() == reflect.Ptr {
 		fv = fv.Elem()
 	}
 
-	if reflect.Struct == fv.Kind() {
-		if "omitempty" == f.Tag.Get("omitempty") && is.Zero(fv) {
-			goto skip
-		}
-
-		if es := self.Validate(fv.Addr().Interface(), nil); es != nil {
-			errs = append(errs, es...)
-			return
-		}
-	}
-
-skip:
-
 	for _, v := range self.validators {
 		if v.Filter(f, fv) {
 			if es := v.Validate(f, fv); es != nil {
-				errs = append(errs, es...)
-				return
+				return es
 			}
 		}
 	}
 
-	return
+	return nil
 }
 
 func (self *Handler) Validate(m interface{}, attributes []string) (errs []error) {
