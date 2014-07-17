@@ -23,8 +23,10 @@ func (self *Struct) Filter(f reflect.StructField, fv reflect.Value) bool {
 }
 
 func (self *Struct) Validate(f reflect.StructField, fv reflect.Value) []error {
-	if es := self.CoreValidate.handler.Validate(fv.Addr().Interface(), nil); es != nil {
-		return es
+	if fv.CanAddr() {
+		if es := self.CoreValidate.handler.Validate(fv.Addr().Interface(), nil); es != nil {
+			return es
+		}
 	}
 
 	return nil
