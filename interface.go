@@ -20,5 +20,11 @@ func (self *Interface) Validate(f reflect.StructField, fv reflect.Value) (errs [
 		errs = append(errs, errors.New(i18n.T("%s cannot be blank", f.Name)))
 	}
 
+	if !fv.IsNil() && fv.Elem().Kind() == reflect.Ptr {
+		if errs := self.CoreValidate.handler.Validate(fv.Elem().Interface(), nil); errs != nil {
+			return errs
+		}
+	}
+
 	return
 }
